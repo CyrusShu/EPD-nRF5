@@ -160,13 +160,40 @@ async function syncTime(mode) {
   if (mode === 2) {
     if (!confirm('提醒：时钟模式目前使用全刷实现，此功能目前多用于修复老化屏残影问题，不建议长期开启，是否继续？')) return;
   }
-  const timestamp = new Date().getTime() / 1000;
+  // 时区：默认用浏览器报的偏移，但允许在「时区」框里手填覆盖。
+  // 为什么要能覆盖：价签显示的墙钟 = UTC秒 + 这个偏移，而有些手机/浏览器报的偏移是错的
+  // （实测遇到报 +9 的：屏上比北京时间快 1 小时，23:05 就跳到了第二天）。
+  const browserTZ = -(new Date().getTimezoneOffset() / 60);
+  const tzBox = document.getElementById('tzhours');
+  const tzIn = tzBox && tzBox.value !== '' ? parseFloat(tzBox.value) : NaN;
+  const manual = !isNaN(tzIn);
+  const tz = manual ? tzIn : browserTZ;
+  if (!isFinite(tz) || tz !== Math.trunc(tz) || tz < -12 || tz > 14) {
+    addLog(`时区「${tzBox ? tzBox.value : ''}」不是 -12~14 的整数，先没发。`, '⚠ ');
+    return;
+  }
+  const wall = new Date(Date.now() + tz * 3600 * 1000);
+  const wallTXT = wall.getUTCFullYear() + '-' +
+    String(wall.getUTCMonth() + 1).padStart(2, '0') + '-' +
+    String(wall.getUTCDate()).padStart(2, '0') + ' ' +
+    String(wall.getUTCHours()).padStart(2, '0') + ':' +
+    String(wall.getUTCMinutes()).padStart(2, '0') + ':' +
+    String(wall.getUTCSeconds()).padStart(2, '0');
+  addLog(`时间同步：本机 ${new Date().toLocaleString()}，浏览器时区 UTC${browserTZ >= 0 ? '+' : ''}${browserTZ}`
+    + (manual ? `，本次用手填的 UTC${tz >= 0 ? '+' : ''}${tz}` : '')
+    + ` → 价签会显示 ${wallTXT}`);
+  if (manual && Math.abs(tz - browserTZ) >= 1) {
+    addLog(`（浏览器报的 UTC${browserTZ >= 0 ? '+' : ''}${browserTZ} 跟手填的 UTC${tz >= 0 ? '+' : ''}${tz} 差得多 ——`
+      + ` 屏上时间不对就是这个原因）`, '⚠ ');
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000);   // 真实 UTC 秒（跟手机时区无关）
   const data = new Uint8Array([
     (timestamp >> 24) & 0xFF,
     (timestamp >> 16) & 0xFF,
     (timestamp >> 8) & 0xFF,
     timestamp & 0xFF,
-    -(new Date().getTimezoneOffset() / 60),
+    tz & 0xFF,
     mode
   ]);
   if (await write(EpdCmd.SET_TIME, data)) {

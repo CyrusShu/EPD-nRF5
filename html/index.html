@@ -58,6 +58,11 @@
 					<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">时钟模式</button>
 					<button id="clearscreenbutton" type="button" class="secondary" onclick="clearScreen()">清除屏幕</button>
 				</div>
+				<div class="flex-group">
+					<label for="tzhours">时区</label>
+					<input type="number" id="tzhours" value="" min="-12" max="14" step="1"
+						placeholder="自动" style="width:5.5em" title="发给价签的时区偏移（整数小时）。留空 = 用浏览器报的；有些手机会报错（遇到报 +9 的），填 8 强制按北京时间">
+				</div>
 				<div class="flex-group right debug">
 					<input type="text" id="cmdTXT" value="">
 					<button id="sendcmdbutton" type="button" class="primary" onclick="sendcmd()">发送命令</button>
