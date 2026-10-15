@@ -11,7 +11,7 @@
 
 <body>
 	<div class="main">
-		<h3>墨水屏日历</h3>
+		<h3>墨水屏日历 <a href="/base" style="font-size:13px;font-weight:400;margin-left:.6em">基站状态 / 配置 →</a></h3>
 		<fieldset>
 			<legend>蓝牙连接</legend>
 			<div class="flex-container">
@@ -57,6 +57,16 @@
 					<button id="calendarmodebutton" type="button" class="primary" onclick="syncTime(1)">日历模式</button>
 					<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">时钟模式</button>
 					<button id="clearscreenbutton" type="button" class="secondary" onclick="clearScreen()">清除屏幕</button>
+				</div>
+				<!-- 2026-10-16：两套方案（省电 / 常电）。命令 74 00 / 74 01 见固件 case 0x74。
+				     省电 = 窗口广播 + 不画天气温度 + 只在 0 点全刷；常电 = 广播常开 + 照旧。
+				     重启回默认（省电）。 -->
+				<div class="flex-group">
+					<label>方案</label>
+					<button id="modesavebutton" type="button" class="primary" onclick="setZkMode(0)"
+						title="省电：只在 23:50–00:10 那窗里广播+刷屏；天气温度不画">省电</button>
+					<button id="modealwaysbutton" type="button" class="secondary" onclick="setZkMode(1)"
+						title="常电：广播常开、天气温度照旧、收到命令就刷（调试台/接电时用）">常电</button>
 				</div>
 				<div class="flex-group">
 					<label for="tzhours">时区</label>
