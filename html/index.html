@@ -58,16 +58,8 @@
 					<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">时钟模式</button>
 					<button id="clearscreenbutton" type="button" class="secondary" onclick="clearScreen()">清除屏幕</button>
 				</div>
-				<!-- 2026-10-16：两套方案（省电 / 常电）。命令 74 00 / 74 01 见固件 case 0x74。
-				     省电 = 窗口广播 + 不画天气温度 + 只在 0 点全刷；常电 = 广播常开 + 照旧。
-				     重启回默认（省电）。 -->
-				<div class="flex-group">
-					<label>方案</label>
-					<button id="modesavebutton" type="button" class="primary" onclick="setZkMode(0)"
-						title="省电：只在 23:50–00:10 那窗里广播+刷屏；天气温度不画">省电</button>
-					<button id="modealwaysbutton" type="button" class="secondary" onclick="setZkMode(1)"
-						title="常电：广播常开、天气温度照旧、收到命令就刷（调试台/接电时用）">常电</button>
-				</div>
+				<!-- 2026-10-16 晚：**方案按钮已撤**（用户："还是不区分方案了，天气按天给
+				     ⇒ 一天一变 ⇒ 只需要 0 点刷新"）。要切功能就手打十六进制命令。 -->
 				<div class="flex-group">
 					<label for="tzhours">时区</label>
 					<input type="number" id="tzhours" value="" min="-12" max="14" step="1"

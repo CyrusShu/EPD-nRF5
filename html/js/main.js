@@ -217,21 +217,6 @@ async function sendcmd() {
   await write(bytes[0], bytes.length > 1 ? bytes.slice(1) : null);
 }
 
-// 2026-10-16：两套方案（省电 / 常电）。固件那条命令 0x74 只改 RAM，重启回默认=省电。
-//   省电 = 窗口广播（23:50–00:10 + 每 6 小时 30 秒 + 开机 5 分钟）+ 不画天气温度
-//          + 只在 0 点那一窗里全刷；
-//   常电 = 广播常开、天气温度照旧、收到命令就刷（调试台/接电时用）。
-// 固件会用一条 "mode=save"/"mode=always" 的通知回话（见 onNotification 的日志里）。
-async function setZkMode(mode) {
-  try {
-    await write(0x74, [mode]);
-    addLog(mode === 1
-      ? "方案 → 常电：广播常开、天气温度照旧、有命令就刷（重启回省电）"
-      : "方案 → 省电：只在 23:50–00:10 那窗里广播+刷屏，天气温度不画（重启后仍是省电）");
-  } catch (e) {
-    addLog("切方案失败：" + e);
-  }
-}
 
 function convertUC8159(blackWhiteData, redWhiteData) {
   const halfLength = blackWhiteData.length;
